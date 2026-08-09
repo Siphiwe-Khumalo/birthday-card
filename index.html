@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>For Mbali</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+  rel="stylesheet"
+/>
+<style>
+/* =========================================================
+   Tokens
+   ========================================================= */
+:root {
+  --warm-white: #f7f1f5;
+  --charcoal: #191420;
+
+  --dusty-rose: #d59bb8;
+  --dusty-rose-dim: #c07fa0;
+  --mauve: #a687c4;
+  --wine: #5b3d73;
+  --wine-deep: #3a2749;
+
+  --panel: rgba(20, 14, 26, 0.55);
+  --panel-soft: rgba(20, 14, 26, 0.36);
+  --hairline: rgba(247, 241, 245, 0.22);
+  --hairline-strong: rgba(247, 241, 245, 0.42);
+
+  --text-primary: #f6f1ec;
+  --text-muted: rgba(247, 241, 245, 0.7);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  --space-1: 0.5rem;
+  --space-2: 0.875rem;
+  --space-3: 1.5rem;
+  --space-4: 2.25rem;
+  --space-5: 3.5rem;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100svh;
+  background: var(--charcoal);
+}
+
+h1, h2, p { margin: 0; }
+button { font-family: inherit; }
+img, svg { display: block; }
+
+/* =========================================================
+   Photograph backdrop — with a little parallax life
+   ========================================================= */
+.photo-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.photo-backdrop {
+  position: absolute;
+  inset: -3% -3%;
+  background-size: cover;
+  background-position: center 28%;
+  background-repeat: no-repeat;
+  filter: saturate(0.9) brightness(0.8);
+  transition: transform 0.2s linear;
+  will-change: transform;
+}
+
+.backdrop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-color: rgba(25, 16, 32, 0.5);
+  pointer-events: none;
+}
+
+/* Fine paper-grain texture, purely tonal — no gradients */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@media (min-width: 700px) {
+  .photo-backdrop { background-position: center 20%; }
+}
+
+/* =========================================================
+   Screens
+   ========================================================= */
+.screen {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------------------------------------------------------
+   Gate screen
+   --------------------------------------------------------- */
+.gate-screen {
+  justify-content: center;
+  padding: var(--space-3);
+  transition: opacity 0.7s var(--ease), filter 0.7s var(--ease);
+}
+
+.gate-screen.leaving {
+  opacity: 0;
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+.eyebrow {
+  display: block;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--mauve);
+  margin-bottom: var(--space-2);
+  opacity: 0;
+  animation: rise-in 0.7s var(--ease) 0.1s both;
+}
+
+.eyebrow::before { content: "// "; color: var(--text-muted); }
+
+.gate-card {
+  width: 100%;
+  max-width: 23rem;
+  padding: var(--space-4) var(--space-3);
+  background: var(--panel);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  text-align: center;
+  position: relative;
+  animation: rise-in 0.9s var(--ease) 0.2s both;
+}
+
+/* fold line, like a card that's been creased once */
+.gate-card::after {
+  content: "";
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  top: 38%;
+  height: 1px;
+  background: var(--hairline);
+  opacity: 0.5;
+}
+
+.gate-line {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 1.75rem);
+  font-weight: 500;
+  line-height: 1.32;
+  position: relative;
+}
+
+.gate-line em {
+  font-style: italic;
+  color: var(--dusty-rose);
+  font-weight: 400;
+}
+
+.gate-subline {
+  margin-top: var(--space-2);
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  position: relative;
+}
+
+.name-form {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2);
+  text-align: left;
+  position: relative;
+}
+
+.name-field { flex: 1; min-width: 0; }
+
+.name-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-1);
+}
+
+.name-input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  background: rgba(247, 241, 245, 0.06);
+  border: 1px solid var(--hairline-strong);
+  border-radius: 3px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.name-input::placeholder { color: rgba(247, 241, 245, 0.4); }
+.name-input:hover { border-color: rgba(247, 241, 245, 0.55); }
+
+.name-input:focus-visible {
+  outline: none;
+  border-color: var(--dusty-rose);
+  background: rgba(247, 241, 245, 0.09);
+}
+
+.name-input.shake { animation: shake 0.4s var(--ease); }
+
+.name-error {
+  min-height: 1.1em;
+  font-size: 0.8125rem;
+  color: var(--dusty-rose);
+  margin: var(--space-1) 0 0;
+  text-align: left;
+}
+
+/* --- Signature element: the wax-seal submit button --- */
+.seal-btn {
+  flex-shrink: 0;
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 50%;
+  border: none;
+  background: var(--wine);
+  color: var(--warm-white);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s var(--ease-pop), background 0.2s var(--ease);
+}
+
+.seal-btn::before {
+  /* engraved ring, purely tonal border — no gradient */
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 241, 245, 0.28);
+}
+
+.seal-monogram {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  position: relative;
+  transform: translateY(-1px);
+}
+
+.seal-arrow {
+  position: absolute;
+  font-size: 0.9rem;
+  opacity: 0;
+  transform: translateX(-3px);
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.seal-btn:hover { background: var(--dusty-rose-dim); transform: translateY(-2px); }
+.seal-btn:hover .seal-monogram { opacity: 0; }
+.seal-btn:hover .seal-arrow { opacity: 1; transform: translateX(0); }
+.seal-btn:active { transform: translateY(0) scale(0.94); }
+
+.seal-btn:focus-visible {
+  outline: 2px solid var(--dusty-rose);
+  outline-offset: 3px;
+}
+
+/* crack-open flourish on successful submit */
+.seal-btn.cracking {
+  animation: seal-crack 0.55s var(--ease-pop) forwards;
+}
+
+@keyframes seal-crack {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.18) rotate(-4deg); }
+  100% { transform: scale(0.2) rotate(8deg); opacity: 0; }
+}
+
+.name-hint {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  opacity: 0.65;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------
+   Birthday screen
+   --------------------------------------------------------- */
+.birthday-screen {
+  justify-content: flex-start;
+  padding: var(--space-5) var(--space-3) var(--space-5);
+  gap: var(--space-4);
+  opacity: 0;
+}
+
+.birthday-screen.visible {
+  opacity: 1;
+  animation: rise-in 0.9s var(--ease) both;
+}
+
+.birthday-header {
+  width: 100%;
+  max-width: 36rem;
+  text-align: center;
+  margin-top: var(--space-3);
+}
+
+.birthday-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 7vw, 3.1rem);
+  line-height: 1.12;
+}
+
+.birthday-heading .word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.birthday-heading .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.5em) rotate(2deg);
+}
+
+.birthday-heading.animate .char {
+  animation: char-rise 0.6s var(--ease-pop) forwards;
+}
+
+.dev-joke {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+}
+
+.dev-joke.revealed {
+  animation: rise-in 0.6s var(--ease) both;
+}
+
+.dev-joke::before { content: "> "; color: var(--mauve); }
+
+.dev-joke .cursor-blink {
+  display: inline-block;
+  width: 0.5em;
+  margin-left: 2px;
+  border-right: 1px solid var(--mauve);
+  animation: blink 1s step-end infinite;
+}
+
+/* Letter */
+.letter-card {
+  width: 100%;
+  max-width: 34rem;
+  padding: var(--space-4) var(--space-3);
+  background: var(--panel-soft);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  position: relative;
+}
+
+.letter-paragraph { font-size: 1rem; line-height: 1.75; color: var(--text-primary); }
+.letter-paragraph + .letter-paragraph { margin-top: var(--space-3); }
+
+.letter-signoff {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.signature {
+  display: inline-block;
+  margin-top: var(--space-1);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: var(--dusty-rose);
+}
+
+[data-reveal] { opacity: 0; transform: translateY(12px); }
+[data-reveal].revealed { animation: rise-in 0.7s var(--ease) both; }
+
+/* Music player */
+.music-section { width: 100%; max-width: 34rem; padding: var(--space-3); }
+
+.music-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.music-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.125rem;
+}
+
+.eq {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+}
+
+.eq span {
+  width: 3px;
+  height: 30%;
+  background: var(--dusty-rose);
+  border-radius: 1px;
+  transition: height 0.15s ease;
+}
+
+.eq.playing span { animation: eq-bounce 0.9s ease-in-out infinite; }
+.eq.playing span:nth-child(1) { animation-delay: -0.6s; }
+.eq.playing span:nth-child(2) { animation-delay: -0.3s; }
+.eq.playing span:nth-child(3) { animation-delay: -0.9s; }
+.eq.playing span:nth-child(4) { animation-delay: -0.15s; }
+
+.music-subtitle { margin-top: 0.3rem; font-size: 0.8125rem; color: var(--text-muted); }
+
+.player {
+  margin-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--panel-soft);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+}
+
+.play-toggle {
+  flex-shrink: 0;
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 50%;
+  background: var(--wine);
+  border: none;
+  color: var(--warm-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.25);
+  transition: background 0.2s var(--ease), transform 0.15s var(--ease-pop);
+}
+
+.play-toggle:hover { background: var(--dusty-rose-dim); transform: translateY(-1px); }
+.play-toggle:active { transform: scale(0.95); }
+.play-toggle:focus-visible { outline: 2px solid var(--dusty-rose); outline-offset: 2px; }
+
+.icon { width: 1.05rem; height: 1.05rem; fill: currentColor; }
+.icon-play { margin-left: 2px; }
+
+.player-body { flex: 1; min-width: 0; }
+
+.progress-track {
+  position: relative;
+  height: 3px;
+  background: rgba(247, 241, 245, 0.18);
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.progress-track:focus-visible { outline: 2px solid var(--dusty-rose); outline-offset: 4px; }
+
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  background: var(--dusty-rose);
+  border-radius: 2px;
+}
+
+.progress-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--warm-white);
+  transform: translate(-50%, -50%);
+  transition: left 0.05s linear;
+}
+
+.player.is-playing .progress-thumb { box-shadow: 0 0 0 4px rgba(213, 155, 184, 0.28); }
+
+.time-row {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   Sparse decoration
+   ========================================================= */
+.dot {
+  position: fixed;
+  z-index: 1;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(247, 241, 245, 0.5);
+  pointer-events: none;
+  animation: drift 14s ease-in-out infinite;
+}
+
+/* =========================================================
+   Keyframes
+   ========================================================= */
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes char-rise {
+  to { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.35; }
+  50% { transform: translate(6px, -10px); opacity: 0.7; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+
+@keyframes eq-bounce {
+  0%, 100% { height: 25%; }
+  50% { height: 100%; }
+}
+
+/* =========================================================
+   Reduced motion
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .birthday-heading .char { opacity: 1; transform: none; }
+}
+
+/* =========================================================
+   Responsive fine-tuning
+   ========================================================= */
+@media (max-width: 380px) {
+  .gate-card { padding: var(--space-3) var(--space-2); }
+  .letter-card { padding: var(--space-3) var(--space-2); }
+}
+
+@media (min-width: 700px) {
+  .birthday-screen { padding-top: var(--space-5); }
+  .letter-paragraph, .letter-signoff { font-size: 1.0625rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="photo-stage">
+  <div class="photo-backdrop" id="photo-backdrop"></div>
+</div>
+<div class="backdrop-overlay" aria-hidden="true"></div>
+<svg class="grain" aria-hidden="true">
+  <filter id="grain-filter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+    <feColorMatrix type="saturate" values="0" />
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain-filter)" />
+</svg>
+
+<!-- Screen 1: gate / introduction -->
+<main id="gate-screen" class="screen gate-screen" aria-labelledby="gate-heading">
+  <div class="gate-card">
+    <span class="eyebrow">a small thing, compiled with care</span>
+    <p id="gate-heading" class="gate-line">I've made something <em>for you.</em> 💜</p>
+    <p class="gate-subline">But first, I need to know who I'm giving it to&hellip;</p>
+
+    <form id="name-form" class="name-form" novalidate>
+      <div class="name-field">
+        <label for="name-input" class="name-label">Your name</label>
+        <input
+          type="text"
+          id="name-input"
+          name="name"
+          class="name-input"
+          placeholder="Enter your name..."
+          autocomplete="off"
+          autocapitalize="words"
+        />
+      </div>
+      <button type="submit" class="seal-btn" aria-label="Continue">
+        <span class="seal-monogram" aria-hidden="true">M</span>
+        <span class="seal-arrow" aria-hidden="true">→</span>
+      </button>
+    </form>
+    <p id="name-error" class="name-error" role="alert" aria-live="polite"></p>
+    <p class="name-hint">press the seal to open it</p>
+  </div>
+</main>
+
+<!-- Screen 2: the birthday experience -->
+<main id="birthday-screen" class="screen birthday-screen" hidden aria-labelledby="birthday-heading">
+
+  <header class="birthday-header">
+    <h1 id="birthday-heading" class="birthday-heading"></h1>
+    <p class="dev-joke" data-reveal>20 years successfully compiled<span class="cursor-blink" aria-hidden="true"></span></p>
+  </header>
+
+  <section class="letter-card" aria-label="Birthday letter">
+    <p class="letter-paragraph" data-reveal>
+      Happy birthday to someone who's genuinely been such a lovely person to get to know. Even though we've only known each other for a relatively short time, I've really enjoyed every conversation, every random moment, and getting to know the person behind the code, ideas, and everything else that makes you you. You have such a good heart, and I hope you never lose that part of yourself.
+    </p>
+    <p class="letter-paragraph" data-reveal>
+      I hope 20 brings you beautiful moments, new opportunities, big wins, and everything you've been working towards. Keep building, keep dreaming, keep being the amazing person you are, and most importantly, enjoy your day. And selfishly, I hope I get to be around for many more birthdays to come. <span aria-hidden="true">❤️</span>
+    </p>
+    <p class="letter-signoff" data-reveal>
+      Happy 20th, Mbali.<br />
+      <span class="signature">- Siphiwe Khumalo</span>
+    </p>
+  </section>
+
+  <section class="music-section" aria-label="Birthday soundtrack" data-reveal>
+    <div class="music-title-row">
+      <h2 class="music-title">A little soundtrack for your day</h2>
+      <div class="eq" id="eq" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </div>
+    <p class="music-subtitle">Because every good birthday needs a soundtrack.</p>
+
+    <div class="player">
+      <button id="play-toggle" class="play-toggle" type="button" aria-label="Play song">
+        <svg id="icon-play" class="icon icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+        <svg id="icon-pause" class="icon icon-pause" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+      </button>
+
+      <div class="player-body">
+        <div class="progress-track" id="progress-track" role="slider" tabindex="0"
+             aria-label="Song progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-fill" id="progress-fill"></div>
+          <div class="progress-thumb" id="progress-thumb"></div>
+        </div>
+        <div class="time-row">
+          <span id="time-current">0:00</span>
+          <span id="time-duration">0:00</span>
+        </div>
+      </div>
+    </div>
+
+    <audio id="birthday-audio" src="/NF - Got You On My Mind (Audio).mp3" preload="metadata"></audio>
+  </section>
+
+</main>
+
+<script>
+// ============================================================
+// Config
+// ============================================================
+const EXPECTED_NAME = "mbali";
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ============================================================
+// Elements
+// ============================================================
+const gateScreen = document.getElementById("gate-screen");
+const birthdayScreen = document.getElementById("birthday-screen");
+const nameForm = document.getElementById("name-form");
+const nameInput = document.getElementById("name-input");
+const nameError = document.getElementById("name-error");
+const sealBtn = document.querySelector(".seal-btn");
+
+const birthdayHeading = document.getElementById("birthday-heading");
+const revealItems = document.querySelectorAll("[data-reveal]");
+
+const audio = document.getElementById("birthday-audio");
+const playToggle = document.getElementById("play-toggle");
+const iconPlay = document.getElementById("icon-play");
+const iconPause = document.getElementById("icon-pause");
+const player = document.querySelector(".player");
+const progressTrack = document.getElementById("progress-track");
+const progressFill = document.getElementById("progress-fill");
+const progressThumb = document.getElementById("progress-thumb");
+const timeCurrent = document.getElementById("time-current");
+const timeDuration = document.getElementById("time-duration");
+const eq = document.getElementById("eq");
+
+// ============================================================
+// Build the cascading heading once, up front
+// ============================================================
+function buildHeadingChars() {
+  const words = ["Happy", "20th", "Birthday,", "Mbali"];
+  const frag = document.createDocumentFragment();
+  let charIndex = 0;
+
+  words.forEach((word, wordIndex) => {
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "word";
+
+    word.split("").forEach((ch) => {
+      const span = document.createElement("span");
+      span.className = "char";
+      span.textContent = ch;
+      span.style.animationDelay = charIndex * 22 + "ms";
+      charIndex++;
+      wordSpan.appendChild(span);
+    });
+
+    frag.appendChild(wordSpan);
+
+    if (wordIndex < words.length - 1) {
+      const space = document.createElement("span");
+      space.className = "char";
+      space.textContent = "\u00A0";
+      space.style.animationDelay = charIndex * 22 + "ms";
+      charIndex++;
+      frag.appendChild(space);
+    }
+  });
+
+  frag.appendChild(document.createTextNode(" "));
+
+  const heart = document.createElement("span");
+  heart.className = "char";
+  heart.setAttribute("aria-hidden", "true");
+  heart.textContent = "💜";
+  heart.style.animationDelay = charIndex * 22 + "ms";
+  frag.appendChild(heart);
+
+  birthdayHeading.appendChild(frag);
+}
+buildHeadingChars();
+
+// ============================================================
+// Name gate
+// ============================================================
+nameForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const value = nameInput.value.trim();
+
+  if (value.length === 0) {
+    showNameError("Don't be shy — type your name in there.");
+    return;
+  }
+
+  if (value.toLowerCase() !== EXPECTED_NAME) {
+    showNameError("Hmm, that's not quite the name I was expecting.");
+    return;
+  }
+
+  clearNameError();
+  breakSealAndReveal();
+});
+
+function showNameError(message) {
+  nameError.textContent = message;
+  nameInput.classList.remove("shake");
+  void nameInput.offsetWidth;
+  nameInput.classList.add("shake");
+}
+
+function clearNameError() {
+  nameError.textContent = "";
+}
+
+function breakSealAndReveal() {
+  if (!prefersReducedMotion) {
+    sealBtn.classList.add("cracking");
+  }
+  gateScreen.classList.add("leaving");
+
+  const afterFade = () => {
+    gateScreen.hidden = true;
+    birthdayScreen.hidden = false;
+    birthdayScreen.classList.add("visible");
+    birthdayHeading.classList.add("animate");
+    revealLetterAndPlayer();
+  };
+
+  if (prefersReducedMotion) {
+    afterFade();
+  } else {
+    gateScreen.addEventListener("transitionend", afterFade, { once: true });
+  }
+}
+
+// ============================================================
+// Staggered letter / player reveal
+// ============================================================
+function revealLetterAndPlayer() {
+  revealItems.forEach((item, index) => {
+    const delay = prefersReducedMotion ? 0 : 550 + index * 300;
+    setTimeout(() => item.classList.add("revealed"), delay);
+  });
+}
+
+// ============================================================
+// Subtle parallax on the photo (mouse + device tilt)
+// ============================================================
+const photoBackdrop = document.getElementById("photo-backdrop");
+
+if (!prefersReducedMotion && window.matchMedia("(pointer: fine)").matches) {
+  window.addEventListener("mousemove", (event) => {
+    const xRatio = event.clientX / window.innerWidth - 0.5;
+    const yRatio = event.clientY / window.innerHeight - 0.5;
+    photoBackdrop.style.transform = `translate(${xRatio * -14}px, ${yRatio * -10}px)`;
+  });
+}
+
+if (!prefersReducedMotion && window.DeviceOrientationEvent && window.matchMedia("(pointer: coarse)").matches) {
+  window.addEventListener("deviceorientation", (event) => {
+    const gamma = Math.max(-20, Math.min(20, event.gamma || 0));
+    const beta = Math.max(-20, Math.min(20, (event.beta || 0) - 45));
+    photoBackdrop.style.transform = `translate(${gamma * -0.6}px, ${beta * -0.4}px)`;
+  });
+}
+
+// ============================================================
+// Custom audio player
+// ============================================================
+let isPlaying = false;
+let isScrubbing = false;
+
+playToggle.addEventListener("click", () => {
+  if (isPlaying) audio.pause();
+  else audio.play();
+});
+
+audio.addEventListener("play", () => {
+  isPlaying = true;
+  iconPlay.hidden = true;
+  iconPause.hidden = false;
+  playToggle.setAttribute("aria-label", "Pause song");
+  player.classList.add("is-playing");
+  eq.classList.add("playing");
+});
+
+audio.addEventListener("pause", () => {
+  isPlaying = false;
+  iconPlay.hidden = false;
+  iconPause.hidden = true;
+  playToggle.setAttribute("aria-label", "Play song");
+  player.classList.remove("is-playing");
+  eq.classList.remove("playing");
+});
+
+audio.addEventListener("ended", () => {
+  isPlaying = false;
+  iconPlay.hidden = false;
+  iconPause.hidden = true;
+  playToggle.setAttribute("aria-label", "Play song");
+  player.classList.remove("is-playing");
+  eq.classList.remove("playing");
+  setProgress(0);
+});
+
+audio.addEventListener("loadedmetadata", () => {
+  timeDuration.textContent = formatTime(audio.duration);
+});
+
+audio.addEventListener("timeupdate", () => {
+  if (isScrubbing) return;
+  const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+  setProgress(pct);
+  timeCurrent.textContent = formatTime(audio.currentTime);
+});
+
+function setProgress(pct) {
+  progressFill.style.width = pct + "%";
+  progressThumb.style.left = pct + "%";
+  progressTrack.setAttribute("aria-valuenow", Math.round(pct));
+}
+
+function formatTime(seconds) {
+  if (!isFinite(seconds) || isNaN(seconds)) return "0:00";
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+  return `${mins}:${secs}`;
+}
+
+function scrubToClientX(clientX) {
+  const rect = progressTrack.getBoundingClientRect();
+  const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+  if (audio.duration) audio.currentTime = ratio * audio.duration;
+  setProgress(ratio * 100);
+}
+
+progressTrack.addEventListener("pointerdown", (event) => {
+  isScrubbing = true;
+  scrubToClientX(event.clientX);
+  progressTrack.setPointerCapture(event.pointerId);
+});
+progressTrack.addEventListener("pointermove", (event) => {
+  if (!isScrubbing) return;
+  scrubToClientX(event.clientX);
+});
+progressTrack.addEventListener("pointerup", () => { isScrubbing = false; });
+progressTrack.addEventListener("pointercancel", () => { isScrubbing = false; });
+
+progressTrack.addEventListener("keydown", (event) => {
+  if (!audio.duration) return;
+  const step = 5;
+  if (event.key === "ArrowRight") audio.currentTime = Math.min(audio.duration, audio.currentTime + step);
+  else if (event.key === "ArrowLeft") audio.currentTime = Math.max(0, audio.currentTime - step);
+  else return;
+  event.preventDefault();
+});
+
+// ============================================================
+// Sparse ambient dots
+// ============================================================
+function createAmbientDots() {
+  if (prefersReducedMotion) return;
+  const count = 5;
+  for (let i = 0; i < count; i++) {
+    const dot = document.createElement("span");
+    dot.className = "dot";
+    dot.style.left = Math.random() * 100 + "vw";
+    dot.style.top = Math.random() * 100 + "vh";
+    dot.style.animationDelay = Math.random() * 8 + "s";
+    dot.style.animationDuration = 12 + Math.random() * 8 + "s";
+    document.body.appendChild(dot);
+  }
+}
+createAmbientDots();
+</script>
+</body>
+</html>
